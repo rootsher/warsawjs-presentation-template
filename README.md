@@ -1,4 +1,4 @@
-# WarsawJS Presentation Template
+# WarsawJS - Wzorce projektowe dla aplikacji enterprise w Node.js
 
 ![Logo](/themes/warsawjs/pictures/logo.png)
 
