@@ -109,19 +109,69 @@
         </div>
     </section>
 
-    <section class="slide">
+    <section class="slide slide--promises">
         <div>
-            <h2>Podstawowe bloki budulcowe</h2>
             <ul>
-                <li>
-                    Promises/A+
-                    <ul>
-                        <li>istota - czym są promisy?</li>
-                        <li>zalety korzystania z promisów</li>
-                    </ul>
-                </li>
+                <li>Promises/A+ - zalety korzystania z promisów</li>
             </ul>
-            <!-- porownanie asynchronous vs. promises -->
+            <table>
+                <tr>
+                    <td>
+                        <h4>podejście tradycyjne</h4>
+                        <pre>
+                            <code>function saveFileToMongo(fileName, callback) {</code>
+                            <code>    fs.readFile(fileName, function (err, data) {</code>
+                            <code>        if (err) {</code>
+                            <code>            return callback(err);</code>
+                            <code>        }</code>
+                            <code>&nbsp;</code>
+                            <code>        collection.insert({</code>
+                            <code>            fileName: fileName,</code>
+                            <code>            data: data</code>
+                            <code>        }, function (err, result) {</code>
+                            <code>            if (err) {</code>
+                            <code>                return callback(err);</code>
+                            <code>            }</code>
+                            <code>&nbsp;</code>
+                            <code>            callback();</code>
+                            <code>        });</code>
+                            <code>    });</code>
+                            <code>}</code>
+                            <code>&nbsp;</code>
+                            <code>saveFileToMongo('config', function (err) {</code>
+                            <code>    if (err) {</code>
+                            <code>        throw err;</code>
+                            <code>    }</code>
+                            <code>&nbsp;</code>
+                            <code>    console.log('Save successful');</code>
+                            <code>});</code>
+                        </pre>
+                    </td>
+                    <td class="approach--promises">
+                        <h4>podejście promisowe</h4>
+                        <pre>
+                            <code>function saveFileToMongo(fileName) {</code>
+                            <code>    var promisedRead = nodefn.call(fs.readFile, fileName);</code>
+                            <code>&nbsp;</code>
+                            <code>    var doc = {</code>
+                            <code>        fileName: fileName,</code>
+                            <code>        data: undefined</code>
+                            <code>    };</code>
+                            <code>&nbsp;</code>
+                            <code>    return promisedRead.then(function (data) {</code>
+                            <code>        doc.data = data;</code>
+                            <code>&nbsp;</code>
+                            <code>        return nodefn.call(collection.insert.bind(collection), doc);</code>
+                            <code>    });</code>
+                            <code>}</code>
+                            <code>&nbsp;</code>
+                            <code>saveFileToMongo.done(function (result) {</code>
+                            <code>    console.log('Save successful');</code>
+                            <code>});</code>
+                        </pre>
+                    </td>
+                </tr>
+            </table>
         </div>
     </section>
 
@@ -132,8 +182,6 @@
                 <li>
                     Promises/A+
                     <ul>
-                        <li>istota - czym są promisy?</li>
-                        <li>zalety korzystania z promisów</li>
                         <li>
                             przykłady implementacji
                             <ul>
@@ -157,25 +205,73 @@
         </div>
     </section>
 
-    <section class="slide">
+    <section class="slide slide--approachFaults">
         <div>
-            <h2>Warstwa składania aplikacji</h2>
             <ul>
-                <li>Co to jest?</li>
-                <li>Wady standardowego podejścia</li>
+                <li>Warstwa składania aplikacji - wady standardowego podejścia</li>
             </ul>
+            <h4>podejście tradycyjne</h4>
+            <pre>
+                <code>mongodb.MongoClient.connect('url', 'testDB', function (err, database) {</code>
+                <code>    if (err) {</code>
+                <code>        throw err;</code>
+                <code>    }</code>
+                <code>&nbsp;</code>
+                <code>    http.createServer(function (req, res) {</code>
+                <code>        database.collection('user').find().toArray(function (err, findResult) {</code>
+                <code>            if (err) {</code>
+                <code>                throw err;</code>
+                <code>            }</code>
+                <code>&nbsp;</code>
+                <code>            res.end(JSON.stringify(findResult));</code>
+                <code>        });</code>
+                <code>    });</code>
+                <code>});</code>
+            </pre>
         </div>
     </section>
 
-    <section class="slide">
+    <section class="slide slide--compositionLayer">
         <div>
-            <h2>Warstwa składania aplikacji</h2>
             <ul>
-                <li>Co to jest?</li>
-                <li>Wady standardowego podejścia</li>
-                <li>Możliwe rozwiązania</li>
+                <li>Warstwa składania aplikacji - możliwe rozwiązania</li>
             </ul>
-            <!-- porownanie standardowego rozwiazania vs. wire.js vs. app-compositor -->
+            <h4>rozwiązanie promisowe - z wykorzystaniem modułu <a href="https://www.npmjs.org/app-compositor">app-compositor</a></h4>
+            <pre>
+                <code>function database() {</code>
+                <code>    var connectionURL = 'mongodb://localhost:27017';</code>
+                <code>    var databaseName = 'testDB';</code>
+                <code>&nbsp;</code>
+                <code>    this.provides(function () {</code>
+                <code>        var MongoClient = mongodb.MongoClient;</code>
+                <code>&nbsp;</code>        
+                <code>        return nodefn.call(MongoClient.connect.bind(MongoClient), connectionURL, databaseName);</code>
+                <code>    });</code>
+                <code>}</code>
+                <code>&nbsp;</code>
+                <code>function web() {</code>
+                <code>    this.requires('database');</code>
+                <code>    this.provides(function (dependencyGetter) {</code>
+                <code>        var database = dependencyGetter('database');</code>
+                <code>&nbsp;</code>
+                <code>        http.createServer(function (req, res) {</code>
+                <code>            database.collection('user').find().toArray(function (err, findResult) {</code>
+                <code>                if (err) {</code>
+                <code>                    throw err;</code>
+                <code>                }</code>
+                <code>&nbsp;</code>
+                <code>                res.end(JSON.stringify(findResult));</code>
+                <code>            });</code>
+                <code>        });</code>
+                <code>    });</code>
+                <code>}</code>
+                <code>&nbsp;</code>
+                <code>manager.runModules([database, web]).done(function applicationCompositionFinished(results) {</code>
+                <code>    console.log('Composition finished! The application is now running.');</code>
+                <code>}, function handleCompositionError(error) {</code>
+                <code>    console.error('Composition error:', error);</code>
+                <code>});</code>
+            </pre>
         </div>
     </section>
 
@@ -250,9 +346,19 @@
         </div>
     </section>
 
-    <section class="slide shout">
+    <section class="slide shout slide--summary">
         <div>
-            <h2>Podsumowanie</h2>
+            <h4>this.<mark>presentation</mark>().<mark>then</mark>(function () {</h4>
+            <p>
+                <strong>when.js</strong> - <a href="https://www.npmjs.org/when">https://www.npmjs.org/when</a><br>
+                <strong>app-compositor</strong> - <a href="https://www.npmjs.org/app-compositor">https://www.npmjs.org/app-compositor</a><br>
+                <strong>wire.js</strong> - <a href="https://www.npmjs.org/wire">https://www.npmjs.org/wire</a><br>
+                <strong>amqplib</strong> - <a href="https://www.npmjs.org/amqplib">https://www.npmjs.org/amqplib</a><br>
+                <strong>zmq</strong> - <a href="https://www.npmjs.org/zmq">https://www.npmjs.org/zmq</a><br>
+            </p>
+            <h4>}).done(function () {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.log('<mark>Dziękujemy za uwagę!</mark>');<br>
+            });</h4>
         </div>
     </section>
 

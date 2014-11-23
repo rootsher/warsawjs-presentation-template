@@ -97,3 +97,67 @@
 .full .progress div {
   border-color: transparent transparent #f7302f;
 }
+
+
+/* own */
+
+.slide pre code {
+  font-size: 11px;
+  line-height: 16px;
+}
+.slide td.approach--promises code {
+  padding-left: 70px;
+}
+.slide td.approach--promises h4 {
+  padding-left: 70px;
+}
+section.slide--promises div {
+  padding-top: 30px !important;
+  padding-left: 80px;
+}
+section.slide--promises h4 {
+  font-size: 18px;
+  font-weight: bold;
+}
+section.slide--promises ul {
+  margin-bottom: 20px;
+}
+
+.slide--approachFaults div {
+  padding-top: 30px !important;
+  padding-left: 80px;
+}
+section.slide--approachFaults h4 {
+  font-size: 18px;
+  font-weight: bold;
+}
+section.slide--approachFaults ul {
+  margin-bottom: 20px;
+}
+
+.slide--compositionLayer div {
+  padding-top: 30px !important;
+  padding-left: 80px;
+}
+section.slide--compositionLayer h4 {
+  font-size: 18px;
+  font-weight: bold;
+}
+section.slide--compositionLayer ul {
+  margin-bottom: 20px;
+}
+section.slide--compositionLayer pre code {
+  font-size: 11px;
+  line-height: 13px;
+}
+section.slide--summary {}
+.slide--summary div {
+  padding-top: 30px !important;
+}
+section.slide--summary h4 {
+  font-size: 28px;
+}
+section.slide--summary p {
+  margin: 0;
+  padding-left: 50px;
+}
